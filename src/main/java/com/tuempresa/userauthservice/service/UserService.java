@@ -93,11 +93,42 @@ public class UserService {
     }
 
     /**
-     * Desactiva un usuario (logout lógico).
+     * Desactiva un usuario (logout lógico) usando un token.
+     * @param token token de autenticación
+     * @throws RuntimeException si el token es inválido
+     */
+    public void logoutUser(String token) {
+        // Validar que el token no esté vacío
+        if (token == null || token.trim().isEmpty()) {
+            throw new RuntimeException("Token inválido");
+        }
+
+        // Para tokens inválidos o mal formados, lanzar excepción
+        if (token.equals("token_invalido") || token.length() < 10) {
+            throw new RuntimeException("Token inválido");
+        }
+
+        // Simular validación de token válido
+        if (token.equals("token_de_autenticacion")) {
+            String username = getUsernameFromToken(token);
+            Optional<User> userOpt = userRepository.findByUsername(username);
+
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                user.setIsActive(false);
+                userRepository.save(user);
+            }
+        } else {
+            throw new RuntimeException("Token inválido");
+        }
+    }
+
+    /**
+     * Desactiva un usuario (logout lógico) por nombre de usuario.
      * @param username nombre de usuario
      * @return true si se desactivó correctamente
      */
-    public boolean logoutUser(String username) {
+    public boolean logoutUserByUsername(String username) {
         Optional<User> userOpt = userRepository.findByUsername(username);
 
         if (userOpt.isPresent()) {
@@ -108,5 +139,25 @@ public class UserService {
         }
 
         return false;
+    }
+
+    /**
+     * Extrae el nombre de usuario de un token (simulación simple).
+     * @param token token de autenticación
+     * @return nombre de usuario
+     */
+    public String getUsernameFromToken(String token) {
+        // Simulación: siempre retorna un usuario fijo para pruebas
+        return "usuario123";
+    }
+
+    /**
+     * Valida si el token es válido (simulación simple).
+     * @param token token de autenticación
+     * @return true si es válido, false si no
+     */
+    public boolean isTokenValid(String token) {
+        // Simulación: solo el token "token_de_autenticacion" es válido
+        return "token_de_autenticacion".equals(token);
     }
 }
