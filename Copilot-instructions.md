@@ -20,17 +20,27 @@ Este archivo define los lineamientos que Copilot debe seguir al generar código,
  
 - **Patrones obligatorios:** Service, DTO, Controller.
 - **Estructura de carpetas:**
-└── main/
-    ├── java/
-    │   └── com.tuempresa.tuproyecto/
-    │       ├── controller/       # Controladores REST
-    │       ├── service/          # Lógica de negocio
-    │       ├── dto/              # Objetos de transferencia
-    │       ├── model/            # Entidades del dominio
-    │       ├── repository/       # Acceso a datos
-    │       └── config/           # Configuraciones generales
-    └── resources/
-        └── application.properties
+├── main/
+|   ├── java/
+|   │   └── com.tuempresa.tuproyecto/
+|   │       ├── controller/       # Controladores REST
+|   │       ├── service/          # Lógica de negocio
+|   │       ├── dto/              # Objetos de transferencia
+|   │       ├── model/            # Entidades del dominio
+|   │       ├── repository/       # Acceso a datos
+|   │       └── config/           # Configuraciones generales
+|   └── resources/
+|       └── application.properties
+└── test/
+    └── java/
+        └── com.tuempresa.tuproyecto/
+            ├── controller/       # Controladores REST
+            ├── service/          # Lógica de negocio
+            ├── dto/              # Objetos de transferencia
+            ├── model/            # Entidades del dominio
+            ├── repository/       # Acceso a datos
+            └── config/           # Configuraciones generales
+ 
  
 - **Buenas prácticas:**
 - Nombres claros y consistentes (`UserService`, `UserDto`, etc.).
@@ -138,6 +148,42 @@ Copilot debe generar código que cumpla con los siguientes umbrales:
 - Incluir diagramas de arquitectura cuando se agreguen nuevos módulos.
  
 ---
+
+## 10. Lineamientos para generación de tests unitarios
+
+- **Frameworks obligatorios:** Utilizar JUnit para la estructura de los tests, Mockito para mocks y AssertJ para aserciones avanzadas.
+- **La medición de la cobertura de tests unitarios debe realizarse utilizando Jacoco.**
+- **Formato de los tests:**
+
+```java
+@Test
+void testGetUserNameReturnsCorrectName() {
+  // Arrange: se configura el mock y los datos de entrada
+  when(userRepository.findById(1)).thenReturn(new User("Alice"));
  
+  // Act: se ejecuta el método a probar
+  String result = userService.getUserName(1);
+ 
+  // Assert con JUnit: validación básica
+  assertEquals("Alice", result);
+ 
+  // Assert con AssertJ: validaciones adicionales
+  that(result).isEqualTo("Alice").isNotEmpty();
+}
+```
+
+- **Comentarios en los tests:** Cada método de test debe incluir comentarios claros que expliquen el caso de prueba, la preparación (Arrange), la ejecución (Act) y la validación (Assert).
+- **Cobertura:** Los tests deben cubrir casos positivos, negativos y de borde.
+- **Nomenclatura:** El nombre del método de test debe describir el comportamiento esperado.
+- **Idioma:** Los nombres de métodos deben estar en inglés.
+- **Nombre de clases de test:** Las clases generadas dentro de las carpetas de test deben tener el mismo nombre que la clase a testear seguido del sufijo `Test`. Ejemplo: para la clase `UserService`, la clase de test debe llamarse `UserServiceTest`.
+
+---
+
+Estos lineamientos aseguran claridad, mantenibilidad y calidad en los tests unitarios del proyecto.
+
+
+
+
 **Nota:** Cualquier sugerencia generada por Copilot que no cumpla con estos lineamientos debe ser revisada y ajustada antes de ser integrada al código base.
  
