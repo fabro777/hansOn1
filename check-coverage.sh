@@ -6,19 +6,63 @@
 
 echo "🔍 Verificando cobertura de código..."
 echo "=================================="
+echo ""
 
-# Ejecutar solo las pruebas que funcionan correctamente (UserServiceTest)
-echo "📋 Ejecutando pruebas unitarias..."
-./mvnw clean test -Dtest=UserServiceTest jacoco:report -q
+# Listar los tests disponibles
+echo "📋 Tests unitarios encontrados:"
+find src/test/java -name "*Test.java" -type f | while read test_file; do
+    test_class=$(basename "$test_file" .java)
+    echo "   ✓ $test_class"
+done
+echo ""
+
+# Ejecutar TODOS los tests unitarios
+echo "📋 Ejecutando TODOS los tests unitarios..."
+echo "   Comando: ./mvnw clean test jacoco:report"
+echo ""
+
+# Ejecutar tests con output más detallado para debugging
+./mvnw clean test jacoco:report
+
+# Capturar el resultado de los tests
+TEST_RESULT=$?
+
+echo ""
+echo "=================================="
 
 # Verificar si las pruebas pasaron
-if [ $? -ne 0 ]; then
-    echo "❌ Error: Las pruebas unitarias fallaron"
+if [ $TEST_RESULT -ne 0 ]; then
+    echo "❌ ERROR: Uno o más tests unitarios fallaron"
+    echo ""
+    echo "📋 Información de debugging:"
+    echo "   • Código de salida: $TEST_RESULT"
+    echo "   • Para ver detalles completos: ./mvnw test"
+    echo "   • Para ejecutar un test específico: ./mvnw test -Dtest=NombreTest"
+    echo ""
+
+    # Verificar si existen reportes de Surefire
+    if [ -d "target/surefire-reports" ]; then
+        echo "📊 Reportes de tests disponibles:"
+        ls -la target/surefire-reports/*.txt 2>/dev/null | while read report; do
+            echo "   • $(basename "$report")"
+        done
+        echo ""
+        echo "💡 Para ver errores específicos, revisa los archivos .txt en target/surefire-reports/"
+    fi
+
     exit 1
 fi
 
-echo "✅ Pruebas unitarias completadas exitosamente"
+echo "✅ Todos los tests unitarios completados exitosamente"
 echo ""
+
+# Contar tests ejecutados
+if [ -d "target/surefire-reports" ]; then
+    TEST_COUNT=$(find target/surefire-reports -name "TEST-*.xml" | wc -l | tr -d ' ')
+    echo "📊 Resumen de ejecución:"
+    echo "   • Tests ejecutados: $TEST_COUNT clases de test"
+    echo ""
+fi
 
 # Generar reporte y verificar cobertura
 echo "📊 Generando reporte de cobertura..."
